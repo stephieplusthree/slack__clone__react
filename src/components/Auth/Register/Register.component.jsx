@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Grid, Form, Segment, Header, Icon, Button, Message } from "semantic-ui-react";
+import {
+  Grid,
+  Form,
+  Segment,
+  Header,
+  Icon,
+  Button,
+  Message,
+} from "semantic-ui-react";
+import firebase from "../../../server/firebase";
+
 import "./Register.css";
 
 const Register = () => {
-
   let user = {
     userName: "",
     email: "",
@@ -14,40 +23,50 @@ const Register = () => {
   let errors = [];
 
   const [userState, setuserState] = useState(user);
-    const [errorState, seterrorState] = useState(errors);
+  const [errorState, seterrorState] = useState(errors);
 
-    const handleInput = (event) => {
-        let target = event.target;
-        setuserState((currentState) => {
-            let currentuser = { ...currentState };
-            currentuser[target.name] = target.value;
-            return currentuser;
-        })
-    }
+  const handleInput = (event) => {
+    let target = event.target;
+    setuserState((currentState) => {
+      let currentuser = { ...currentState };
+      currentuser[target.name] = target.value;
+      return currentuser;
+    });
+  };
 
-    const checkForm = () => {
-        if (isFormEmpty()) {
-            seterrorState((error) => error.concat({ message: "Please fill in all fields." }));
-            return false;
+  const checkForm = () => {
+    if (isFormEmpty()) {
+      seterrorState((error) =>
+        error.concat({ message: "Please fill in all fields" })
+      );
+      return false;
     } else if (!checkPassword()) {
-        seterrorState((error) => error.concat({ message : "Password must be 8 letters long." }));
       return false;
     }
     return true;
-  }
+  };
 
   const isFormEmpty = () => {
-    return !userState.userName.length ||
+    return (
+      !userState.userName.length ||
       !userState.password.length ||
       !userState.confirmpassword.length ||
-      !userState.email.length;
+      !userState.email.length
+    );
   };
 
   const checkPassword = () => {
     if (userState.password.length < 8) {
+      seterrorState((error) =>
+        error.concat({ message: "Password length should be greater than 8." })
+      );
       return false;
-    } 
-    else if (userState.password !== userState.confirmpassword) {
+    } else if (userState.password !== userState.confirmpassword) {
+      seterrorState((error) =>
+        error.concat({
+          message: "Password and Confirm Password does not match.",
+        })
+      );
       return false;
     }
     return true;
@@ -55,16 +74,23 @@ const Register = () => {
 
   const onSubmit = (event) => {
     seterrorState(() => []);
-    if(checkForm()){
 
-    } else {
-
+    if (checkForm()) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(userState.email, userState.password)
+        .then((createdUser) => {
+          console.log(createdUser);
+        })
+        .catch((servererror) => {
+          seterrorState((error) => error.concat(servererror));
+        });
     }
-  }
+  };
 
   const formaterrors = () => {
-    return errorState.map((error, index) => <p key={index}>{error.message}</p>)
-  }
+    return errorState.map((error, index) => <p key={index}>{error.message}</p>);
+  };
   return (
     <Grid verticalAlign="middle" textAlign="center" className="grid-form">
       <Grid.Column style={{ maxWidth: "500px" }}>
@@ -114,11 +140,12 @@ const Register = () => {
           </Segment>
           <Button>Submit</Button>
         </Form>
-       {errorState.length > 0 && <Message error>
+        {errorState.length > 0 && (
+          <Message error>
             <h3>Errors</h3>
             {formaterrors()}
-        </Message>
-        }
+          </Message>
+        )}
       </Grid.Column>
     </Grid>
   );
