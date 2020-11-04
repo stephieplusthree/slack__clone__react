@@ -11,6 +11,7 @@ import {
 import firebase from "../../../server/firebase";
 
 import "./Register.css";
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   let user = {
@@ -27,6 +28,7 @@ const Register = () => {
   const [userState, setuserState] = useState(user);
   const [errorState, seterrorState] = useState(errors);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInput = (event) => {
     let target = event.target;
@@ -77,7 +79,7 @@ const Register = () => {
 
   const onSubmit = (event) => {
     seterrorState(() => []);
-
+    setIsSuccess(false);
     if (checkForm()) {
       setIsLoading(true);
       firebase
@@ -96,7 +98,6 @@ const Register = () => {
 
   const updateuserDetails = (createdUser) => {
     if (createdUser) {
-
       setIsLoading(true);
       createdUser.user
         .updateProfile({
@@ -115,7 +116,6 @@ const Register = () => {
   };
 
   const saveUserInDB = (createdUser) => {
-
     setIsLoading(true);
     userCollectionRef
       .child(createdUser.user.uid)
@@ -124,9 +124,11 @@ const Register = () => {
         photoURL: createdUser.user.photoURL,
       })
       .then(() => {
-        console.log("user Saved in db");
+        setIsLoading(false);
+        setIsSuccess(true);
       })
       .catch((serverError) => {
+        setIsLoading(false);
         seterrorState((error) => error.concat(serverError));
       });
   };
@@ -188,10 +190,18 @@ const Register = () => {
         </Form>
         {errorState.length > 0 && (
           <Message error>
-            <h3>Errors</h3>
+            <h3>Error</h3>
             {formaterrors()}
           </Message>
         )}
+        {isSuccess && (
+          <Message success>
+            <h3>Successfully Registered</h3>
+          </Message>
+        )}
+        <Message>
+            Already a User? <Link to="/login">Login Here</Link>
+        </Message>
       </Grid.Column>
     </Grid>
   );
