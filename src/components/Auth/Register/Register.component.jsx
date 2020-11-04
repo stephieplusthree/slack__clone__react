@@ -69,9 +69,9 @@ const Register = () => {
     <Grid verticalAlign="middle" textAlign="center" className="grid-form">
       <Grid.Column style={{ maxWidth: "500px" }}>
         <Header icon as="h2">
-          <Icon name="slack" />
-          YOUR COMPANY NAME <br />
-          Register
+          <Icon name="slack" /> <br />
+          YOUR COMPANY NAME <br /> <br />
+          Register Page
         </Header>
         <Form onSubmit={onSubmit}>
           <Segment stacked>
