@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Grid, Form, Segment, Header, Icon, Button, Message } from "semantic-ui-react";
+import "./Register.css";
 
 const Register = () => {
 
@@ -26,10 +27,10 @@ const Register = () => {
 
     const checkForm = () => {
         if (isFormEmpty()) {
-            seterrorState((error) => error.concat({ message: "Please fill in all fields" }));
+            seterrorState((error) => error.concat({ message: "Please fill in all fields." }));
             return false;
     } else if (!checkPassword()) {
-        seterrorState((error) => error.concat({ message : "Given password is not valid" }));
+        seterrorState((error) => error.concat({ message : "Password must be 8 letters long." }));
       return false;
     }
     return true;
@@ -53,6 +54,7 @@ const Register = () => {
   };
 
   const onSubmit = (event) => {
+    seterrorState(() => []);
     if(checkForm()){
 
     } else {
@@ -64,7 +66,7 @@ const Register = () => {
     return errorState.map((error, index) => <p key={index}>{error.message}</p>)
   }
   return (
-    <Grid verticalAlign="middle" textAlign="center">
+    <Grid verticalAlign="middle" textAlign="center" className="grid-form">
       <Grid.Column style={{ maxWidth: "500px" }}>
         <Header icon as="h2">
           <Icon name="slack" />
