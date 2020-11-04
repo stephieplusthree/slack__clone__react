@@ -22,6 +22,8 @@ const Register = () => {
 
   let errors = [];
 
+  let userCollectionRef = firebase.database().ref("users");
+
   const [userState, setuserState] = useState(user);
   const [errorState, seterrorState] = useState(errors);
 
@@ -80,17 +82,49 @@ const Register = () => {
         .auth()
         .createUserWithEmailAndPassword(userState.email, userState.password)
         .then((createdUser) => {
-          console.log(createdUser);
+          updateuserDetails(createdUser);
         })
-        .catch((servererror) => {
-          seterrorState((error) => error.concat(servererror));
+        .catch((serverError) => {
+          seterrorState((error) => error.concat(serverError));
         });
     }
+  };
+
+  const updateuserDetails = (createdUser) => {
+    if (createdUser) {
+      createdUser.user
+        .updateProfile({
+          displayName: userState.userName,
+          photoURL: `http://gravatar.com/avatar/${createdUser.user.uid}?d=identicon`,
+        })
+        .then(() => {
+          saveUserInDB(createdUser);
+        })
+        .catch((serverError) => {
+          seterrorState((error) => error.concat(serverError));
+        });
+    }
+  };
+
+  const saveUserInDB = (createdUser) => {
+    userCollectionRef
+      .child(createdUser.user.uid)
+      .set({
+        displayName: createdUser.user.displayName,
+        photoURL: createdUser.user.photoURL,
+      })
+      .then(() => {
+        console.log("user Saved in db");
+      })
+      .catch((serverError) => {
+        seterrorState((error) => error.concat(serverError));
+      });
   };
 
   const formaterrors = () => {
     return errorState.map((error, index) => <p key={index}>{error.message}</p>);
   };
+
   return (
     <Grid verticalAlign="middle" textAlign="center" className="grid-form">
       <Grid.Column style={{ maxWidth: "500px" }}>
