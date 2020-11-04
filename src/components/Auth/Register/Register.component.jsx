@@ -26,6 +26,7 @@ const Register = () => {
 
   const [userState, setuserState] = useState(user);
   const [errorState, seterrorState] = useState(errors);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInput = (event) => {
     let target = event.target;
@@ -78,13 +79,16 @@ const Register = () => {
     seterrorState(() => []);
 
     if (checkForm()) {
+      setIsLoading(true);
       firebase
         .auth()
         .createUserWithEmailAndPassword(userState.email, userState.password)
         .then((createdUser) => {
+          setIsLoading(false);
           updateuserDetails(createdUser);
         })
         .catch((serverError) => {
+          setIsLoading(false);
           seterrorState((error) => error.concat(serverError));
         });
     }
@@ -92,21 +96,27 @@ const Register = () => {
 
   const updateuserDetails = (createdUser) => {
     if (createdUser) {
+
+      setIsLoading(true);
       createdUser.user
         .updateProfile({
           displayName: userState.userName,
           photoURL: `http://gravatar.com/avatar/${createdUser.user.uid}?d=identicon`,
         })
         .then(() => {
+          setIsLoading(false);
           saveUserInDB(createdUser);
         })
         .catch((serverError) => {
+          setIsLoading(false);
           seterrorState((error) => error.concat(serverError));
         });
     }
   };
 
   const saveUserInDB = (createdUser) => {
+
+    setIsLoading(true);
     userCollectionRef
       .child(createdUser.user.uid)
       .set({
@@ -172,7 +182,9 @@ const Register = () => {
               placeholder="Confirm Password"
             />
           </Segment>
-          <Button>Submit</Button>
+          <Button disabled={isLoading} loading={isLoading}>
+            Submit
+          </Button>
         </Form>
         {errorState.length > 0 && (
           <Message error>
