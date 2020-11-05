@@ -10,7 +10,7 @@ import {
 } from "semantic-ui-react";
 import firebase from "../../../server/firebase";
 
-import "./Register.css";
+import "../Auth.css";
 import { Link } from 'react-router-dom';
 
 const Register = () => {
