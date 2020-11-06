@@ -1,0 +1,13 @@
+.userinfo_grid_row{
+    padding : 1.3rem;
+    color: white !important;
+}
+
+.userinfo_displayname{
+    padding : .25rem;
+    color: white !important;
+}
+
+.avatar {
+    color: white !important;
+}

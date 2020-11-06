@@ -11,7 +11,7 @@ import {
 import firebase from "../../../server/firebase";
 
 import "../Auth.css";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Register = () => {
   let user = {
@@ -102,7 +102,7 @@ const Register = () => {
       createdUser.user
         .updateProfile({
           displayName: userState.userName,
-          photoURL: `http://gravatar.com/avatar/${createdUser.user.uid}?d=identicon`,
+          photoURL: `https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg${createdUser.user.uid}?d=identicon`,
         })
         .then(() => {
           setIsLoading(false);
@@ -114,7 +114,7 @@ const Register = () => {
         });
     }
   };
-
+  
   const saveUserInDB = (createdUser) => {
     setIsLoading(true);
     userCollectionRef
@@ -200,7 +200,7 @@ const Register = () => {
           </Message>
         )}
         <Message>
-            Already a User? <Link to="/login">Login Here</Link>
+          Already a User? <Link to="/login">Login Here</Link>
         </Message>
       </Grid.Column>
     </Grid>
