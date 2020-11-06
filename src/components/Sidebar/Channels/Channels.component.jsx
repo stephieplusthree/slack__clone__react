@@ -80,7 +80,7 @@ const Channels = (props) => {
           (0)
         </Menu.Item>
         <Menu.Item>
-          <span onClick={openModal}>
+          <span className="clickable" onClick={openModal}>
             <Icon name="add" /> ADD
           </span>
         </Menu.Item>
