@@ -6,7 +6,9 @@ import { Menu, Icon, Modal, Button, Form, Segment } from "semantic-ui-react";
 
 const Channels = (props) => {
   const [modalOpenState, setModalOpenState] = useState(false);
-  const [channelAddState, setchannelAddState] = useState({});
+  const [channelAddState, setChannelAddState] = useState({ Name : '', Description : '' });
+
+  console.log(channelAddState);
 
   const openModal = () => {
     setModalOpenState(true);
@@ -16,13 +18,16 @@ const Channels = (props) => {
     setModalOpenState(false);
   };
 
-  const onSubmit = () => {
-
-  }
+  const onSubmit = () => {};
 
   const handleInput = (e) => {
-
-  }
+    let target = e.target;
+    setChannelAddState((currentState) => {
+      let updatedState = { ...currentState };
+      updatedState[target.name] = target.value;
+      return updatedState;
+    });
+  };
 
   return (
     <>
@@ -34,11 +39,12 @@ const Channels = (props) => {
           (0)
         </Menu.Item>
         <Menu.Item>
-          <span>
-            <Icon name="add" onClick={openModal} /> ADD
+          <span onClick={openModal}>
+            <Icon name="add" /> ADD
           </span>
         </Menu.Item>
       </Menu.Menu>
+
       <Modal open={modalOpenState} onClose={closeModal}>
         <Modal.Header>
             Create Channel
@@ -47,14 +53,14 @@ const Channels = (props) => {
           <Form onSubmit={onSubmit}>
             <Segment stacked>
               <Form.Input
-                name="name"
+                name="Name"
                 value={channelAddState.Name}
                 onChange={handleInput}
                 type="text"
                 placeholder="Enter Channel Name"
               />
               <Form.Input
-                name="description"
+                name="Description"
                 value={channelAddState.Description}
                 onChange={handleInput}
                 type="text"
@@ -64,12 +70,12 @@ const Channels = (props) => {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-            <Button>
-                <Icon name="checkmark" /> Save
-            </Button>
-            <Button>
-                <Icon name="remove" /> Cancel
-            </Button>
+          <Button>
+            <Icon name="checkmark" /> Save
+          </Button>
+          <Button onClick={closeModal}>
+            <Icon name="remove" /> Cancel
+          </Button>
         </Modal.Actions>
       </Modal>
     </>
