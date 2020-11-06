@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
+import firebase from "../../../server/firebase";
 
 import "./Channels.css";
 import { Menu, Icon, Modal, Button, Form, Segment } from "semantic-ui-react";
 
 const Channels = (props) => {
   const [modalOpenState, setModalOpenState] = useState(false);
-  const [channelAddState, setChannelAddState] = useState({ Name : '', Description : '' });
+  const [channelAddState, setChannelAddState] = useState({
+    name: "",
+    description: "",
+  });
+  const [IsLoadingState, setLoadingState] = useState(false);
 
-  console.log(channelAddState);
+  const channelsRef = firebase.database().ref("channels");
 
   const openModal = () => {
     setModalOpenState(true);
@@ -18,7 +23,43 @@ const Channels = (props) => {
     setModalOpenState(false);
   };
 
-  const onSubmit = () => {};
+  const checkIfFormValid = () => {
+    return (
+      channelAddState && channelAddState.name && channelAddState.description
+    );
+  };
+
+  const onSubmit = () => {
+    
+    if(!checkIfFormValid()){
+        return ;
+    }
+
+    const key = channelsRef.push().key;
+
+    const channel = {
+      id: key,
+      name: channelAddState.name,
+      description: channelAddState.description,
+      created_by: {
+        name: props.user.displayName,
+        avatar: props.user.photoURL,
+      },
+    };
+
+    setLoadingState(true);
+    channelsRef
+      .child(key)
+      .update(channel)
+      .then(() => {
+        setChannelAddState({ name: "", description: "" });
+        setLoadingState(false);
+        closeModal();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleInput = (e) => {
     let target = e.target;
@@ -46,22 +87,20 @@ const Channels = (props) => {
       </Menu.Menu>
 
       <Modal open={modalOpenState} onClose={closeModal}>
-        <Modal.Header>
-            Create Channel
-        </Modal.Header>
+        <Modal.Header>Create Channel</Modal.Header>
         <Modal.Content>
           <Form onSubmit={onSubmit}>
             <Segment stacked>
               <Form.Input
-                name="Name"
-                value={channelAddState.Name}
+                name="name"
+                value={channelAddState.name}
                 onChange={handleInput}
                 type="text"
                 placeholder="Enter Channel Name"
               />
               <Form.Input
-                name="Description"
-                value={channelAddState.Description}
+                name="description"
+                value={channelAddState.description}
                 onChange={handleInput}
                 type="text"
                 placeholder="Enter Channel Description"
@@ -70,7 +109,7 @@ const Channels = (props) => {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button>
+          <Button loading={IsLoadingState} onClick={onSubmit}>
             <Icon name="checkmark" /> Save
           </Button>
           <Button onClick={closeModal}>
@@ -82,4 +121,10 @@ const Channels = (props) => {
   );
 };
 
-export default connect()(Channels);
+const mapStateToProps = (state) => {
+  return {
+    user: state.user.currentUser,
+  };
+};
+
+export default connect(mapStateToProps)(Channels);
