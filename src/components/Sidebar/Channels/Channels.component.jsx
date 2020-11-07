@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { connect } from "react-redux";
 import firebase from "../../../server/firebase";
+import {setChannel} from "../../../store/actioncreator";
 
 import "./Channels.css";
 import { Menu, Icon, Modal, Button, Form, Segment } from "semantic-ui-react";
@@ -12,8 +13,21 @@ const Channels = (props) => {
     description: "",
   });
   const [IsLoadingState, setLoadingState] = useState(false);
-
+  const [channelsState, setChannelsState] = useState([]);
   const channelsRef = firebase.database().ref("channels");
+
+  useEffect(() => {
+    channelsRef.on('child_added',(snap) => {
+        setChannelsState((currentState) => {
+            let updatedState = [...currentState];
+            updatedState.push(snap.val());
+            if(updatedState.length === 1){
+                props.selectChannel(updatedState[0])
+            }
+            return updatedState;
+        })
+    })
+  },[])
 
   const openModal = () => {
     setModalOpenState(true);
@@ -28,6 +42,20 @@ const Channels = (props) => {
       channelAddState && channelAddState.name && channelAddState.description
     );
   };
+
+  const displayChannels = () => {
+    if(setChannelsState.length > 0){
+        return channelsState.map((channel) => {
+            return <Menu.Item
+              key={channel.id}
+              name={channel.name}
+              onClick={() => props.selectChannel()}
+              active={channel.id == props.channel.id}
+            >
+            </Menu.Item>
+          })
+      }
+  }
 
   const onSubmit = () => {
     
@@ -77,8 +105,9 @@ const Channels = (props) => {
           <span>
             <Icon name="exchange" /> Channels
           </span>
-          (0)
+          ({setChannelsState.length})
         </Menu.Item>
+        {displayChannels()}
         <Menu.Item>
           <span className="clickable" onClick={openModal}>
             <Icon name="add" /> ADD
@@ -124,7 +153,14 @@ const Channels = (props) => {
 const mapStateToProps = (state) => {
   return {
     user: state.user.currentUser,
+    channel : state.channel.currentChannel
   };
 };
 
-export default connect(mapStateToProps)(Channels);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        selectChannel : (channel) => dispatch(setChannel(channel))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Channels);
