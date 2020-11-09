@@ -26,7 +26,7 @@ const MessageInput = (props) => {
             messageRef.child(props.channel.id)
             .push()
             .set(createMessageInfo())
-            .then(() => console.log('sent'))
+            .then(() => setMessageState(''))
             .catch((err) => console.log(err))
         }
     }
@@ -46,7 +46,7 @@ const MessageInput = (props) => {
     return <Segment>
         <Input 
             onChange={onMessageChange}
-            fluid = "true"
+            fluid = {true}
             name = "message"
             value ={messageState}
             label={createActionButtons()}
