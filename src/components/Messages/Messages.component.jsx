@@ -32,14 +32,14 @@ const Messages = (props) => {
         if (messagesState.length > 0) {
             return messagesState.map((message) => {
         return (
-          <MessageContent key={message.timestamp} message={message} />
+          <MessageContent ownMessage={message.user.id === props.user.id} key={message.timestamp} message={message} />
         );
       });
     }
   };
 
   return (
-    <div>
+    <div className="messages">
       <MessageHeader />
       <Segment className="messagecontent">
         <Comment.Group>{displayMessages()}</Comment.Group>
@@ -51,7 +51,8 @@ const Messages = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    channel: state.channel.currentChannel
+    channel : state.channel.currentChannel,
+    user : state.user.currentUser 
   };
 };
 
