@@ -7,6 +7,7 @@ const Messages = () => {
     return (
         <div>
             <MessageHeader />
+            <MessageInput />
         </div>
     )
 }
